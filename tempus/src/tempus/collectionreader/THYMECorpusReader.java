@@ -19,8 +19,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.io.IOUtils;
-//CHANGED type system for TIMEX3
-import org.apache.ctakes.typesystem.type.textsem.TimeMention;
 import org.apache.log4j.Logger;
 import org.apache.uima.cas.CAS;
 import org.apache.uima.cas.CASException;
@@ -33,7 +31,6 @@ import org.apache.uima.jcas.JCas;
 import org.apache.uima.resource.ResourceInitializationException;
 import org.apache.uima.util.Progress;
 import org.apache.uima.util.ProgressImpl;
-import org.cleartk.timeml.type.TemporalLink;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -42,6 +39,9 @@ import org.xml.sax.SAXException;
 import tempus.type.DocumentCreationTime;
 import tempus.type.Event;
 import tempus.type.Section;
+import tempus.type.TemporalLink;
+import tempus.type.Timex3;
+//CHANGED type system for TIMEX3
 
 
 public class THYMECorpusReader extends CollectionReader_ImplBase {
@@ -520,10 +520,10 @@ public class THYMECorpusReader extends CollectionReader_ImplBase {
 							
 
 
-							TimeMention tm = new TimeMention(jcas);
+							Timex3 tm = new Timex3(jcas);
 							tm.setBegin(span1);
 							tm.setEnd(span2);
-							tm.setTimeClass(timex_type);
+							tm.setTimex3Type(timex_type);
 
 							tm.addToIndexes();
 
@@ -574,9 +574,10 @@ public class THYMECorpusReader extends CollectionReader_ImplBase {
 
 							// create a THYME_Relation with all info
 							//THYME_Relation tr = new THYME_Relation(id, relation_type, source, target, relation_subtype);
-
+							
+							//TODO: add source and targets!!
 							TemporalLink tl = new TemporalLink(jcas);
-							tl.setRelationType(relation_subtype);
+							tl.setTemporalLinkType(relation_subtype);
 							tl.addToIndexes();
 
 

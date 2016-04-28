@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.ctakes.typesystem.type.syntax.BaseToken;
-import org.apache.ctakes.typesystem.type.textsem.TimeMention;
 import org.apache.ctakes.typesystem.type.textspan.Sentence;
 import org.apache.log4j.Logger;
 import org.apache.uima.UimaContext;
@@ -38,12 +37,13 @@ import org.cleartk.ml.viterbi.DefaultOutcomeFeatureExtractor;
 import org.cleartk.ml.viterbi.ViterbiDataWriterFactory;
 
 import tempus.type.Section;
+import tempus.type.Timex3;
 
 import com.google.common.collect.Lists;
 
 /**
  * Class for Timex3 DATE annotations in the THYME corpus
- * Requires Annotations of type Section, Sentence, BaseToken, TimeMention
+ * Requires Annotations of type Section, Sentence, BaseToken, Timex3
  * Based on examples from the tutorials in the clearTK package: https://cleartk.github.io/cleartk/ 
  * 
  * @author Sumithra Velupillai
@@ -57,7 +57,7 @@ public class TimexDATEAnnotator extends CleartkSequenceAnnotator<String>{
 
 	private List<CleartkExtractor<BaseToken, BaseToken>> contextFeatureExtractors;
 
-	private BioChunking<BaseToken, TimeMention> chunking;
+	private BioChunking<BaseToken, Timex3> chunking;
 
 	// additions to test
 	// TODO: are these used??
@@ -67,8 +67,8 @@ public class TimexDATEAnnotator extends CleartkSequenceAnnotator<String>{
 	public void initialize(UimaContext context) throws ResourceInitializationException {
 		super.initialize(context);
 
-		// define chunking type - this way, only BIO labels are used. Could also pass label names from TimeMention type
-		this.chunking = new BioChunking<BaseToken, TimeMention>(BaseToken.class, TimeMention.class);
+		// define chunking type - this way, only BIO labels are used. Could also pass label names from Timex3 type
+		this.chunking = new BioChunking<BaseToken, Timex3>(BaseToken.class, Timex3.class);
 
 		// add features: word, character pattern, stem, pos
 		this.tokenFeatureExtractors = Lists.newArrayList();
@@ -147,12 +147,12 @@ public class TimexDATEAnnotator extends CleartkSequenceAnnotator<String>{
 
 				// during training, convert Times to chunk labels and write the training Instances
 				if (this.isTraining()) {
-					List<TimeMention> dates = new ArrayList<TimeMention>();
+					List<Timex3> dates = new ArrayList<Timex3>();
 
 					// Classify only timex3 annotations of type DATE
-					List<TimeMention> trainingdata = JCasUtil.selectCovered(jCas, TimeMention.class, sentence);
-					for(TimeMention tm : trainingdata){
-						if(tm.getTimeClass().equals("DATE")){	
+					List<Timex3> trainingdata = JCasUtil.selectCovered(jCas, Timex3.class, sentence);
+					for(Timex3 tm : trainingdata){
+						if(tm.getTimex3Type().equals("DATE")){	
 							dates.add(tm);
 						}
 					}
@@ -171,10 +171,10 @@ public class TimexDATEAnnotator extends CleartkSequenceAnnotator<String>{
 		// add IDs and type to all predicted Timex3s
 		int timeIndex = 1;
 		if(!this.isTraining()){
-			for (TimeMention time : JCasUtil.select(jCas, TimeMention.class)) {
-				if(time.getTimeClass()==null){
-					time.setTimeClass("DATE");
-					time.setId(timeIndex);
+			for (Timex3 time : JCasUtil.select(jCas, Timex3.class)) {
+				if(time.getTimex3Type()==null){
+					time.setTimex3Type("DATE");
+					time.setId("TDATE"+timeIndex);
 				}
 
 				timeIndex += 1;

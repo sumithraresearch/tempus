@@ -1,5 +1,5 @@
 
-/* First created by JCasGen Thu Apr 14 14:54:36 BST 2016 */
+/* First created by JCasGen Thu Apr 28 11:48:38 BST 2016 */
 package tempus.type;
 
 import org.apache.uima.jcas.JCas;
@@ -16,7 +16,7 @@ import org.apache.uima.jcas.tcas.Annotation_Type;
 /** 
  * Updated by JCasGen Thu Apr 28 12:03:49 BST 2016
  * @generated */
-public class Section_Type extends Annotation_Type {
+public class TimeRelationAnnotationElement_Type extends Annotation_Type {
   /** @generated 
    * @return the generator for this type
    */
@@ -26,47 +26,47 @@ public class Section_Type extends Annotation_Type {
   private final FSGenerator fsGenerator = 
     new FSGenerator() {
       public FeatureStructure createFS(int addr, CASImpl cas) {
-  			 if (Section_Type.this.useExistingInstance) {
+  			 if (TimeRelationAnnotationElement_Type.this.useExistingInstance) {
   			   // Return eq fs instance if already created
-  		     FeatureStructure fs = Section_Type.this.jcas.getJfsFromCaddr(addr);
+  		     FeatureStructure fs = TimeRelationAnnotationElement_Type.this.jcas.getJfsFromCaddr(addr);
   		     if (null == fs) {
-  		       fs = new Section(addr, Section_Type.this);
-  			   Section_Type.this.jcas.putJfsFromCaddr(addr, fs);
+  		       fs = new TimeRelationAnnotationElement(addr, TimeRelationAnnotationElement_Type.this);
+  			   TimeRelationAnnotationElement_Type.this.jcas.putJfsFromCaddr(addr, fs);
   			   return fs;
   		     }
   		     return fs;
-        } else return new Section(addr, Section_Type.this);
+        } else return new TimeRelationAnnotationElement(addr, TimeRelationAnnotationElement_Type.this);
   	  }
     };
   /** @generated */
   @SuppressWarnings ("hiding")
-  public final static int typeIndexID = Section.typeIndexID;
+  public final static int typeIndexID = TimeRelationAnnotationElement.typeIndexID;
   /** @generated 
      @modifiable */
   @SuppressWarnings ("hiding")
-  public final static boolean featOkTst = JCasRegistry.getFeatOkTst("tempus.type.Section");
+  public final static boolean featOkTst = JCasRegistry.getFeatOkTst("tempus.type.TimeRelationAnnotationElement");
  
   /** @generated */
-  final Feature casFeat_id;
+  final Feature casFeat_Id;
   /** @generated */
-  final int     casFeatCode_id;
+  final int     casFeatCode_Id;
   /** @generated
    * @param addr low level Feature Structure reference
    * @return the feature value 
    */ 
   public String getId(int addr) {
-        if (featOkTst && casFeat_id == null)
-      jcas.throwFeatMissing("id", "tempus.type.Section");
-    return ll_cas.ll_getStringValue(addr, casFeatCode_id);
+        if (featOkTst && casFeat_Id == null)
+      jcas.throwFeatMissing("Id", "tempus.type.TimeRelationAnnotationElement");
+    return ll_cas.ll_getStringValue(addr, casFeatCode_Id);
   }
   /** @generated
    * @param addr low level Feature Structure reference
    * @param v value to set 
    */    
   public void setId(int addr, String v) {
-        if (featOkTst && casFeat_id == null)
-      jcas.throwFeatMissing("id", "tempus.type.Section");
-    ll_cas.ll_setStringValue(addr, casFeatCode_id, v);}
+        if (featOkTst && casFeat_Id == null)
+      jcas.throwFeatMissing("Id", "tempus.type.TimeRelationAnnotationElement");
+    ll_cas.ll_setStringValue(addr, casFeatCode_Id, v);}
     
   
 
@@ -77,13 +77,13 @@ public class Section_Type extends Annotation_Type {
 	 * @param jcas JCas
 	 * @param casType Type 
 	 */
-  public Section_Type(JCas jcas, Type casType) {
+  public TimeRelationAnnotationElement_Type(JCas jcas, Type casType) {
     super(jcas, casType);
     casImpl.getFSClassRegistry().addGeneratorForType((TypeImpl)this.casType, getFSGenerator());
 
  
-    casFeat_id = jcas.getRequiredFeatureDE(casType, "id", "uima.cas.String", featOkTst);
-    casFeatCode_id  = (null == casFeat_id) ? JCas.INVALID_FEATURE_CODE : ((FeatureImpl)casFeat_id).getCode();
+    casFeat_Id = jcas.getRequiredFeatureDE(casType, "Id", "uima.cas.String", featOkTst);
+    casFeatCode_Id  = (null == casFeat_Id) ? JCas.INVALID_FEATURE_CODE : ((FeatureImpl)casFeat_Id).getCode();
 
   }
 }

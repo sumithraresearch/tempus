@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import org.apache.ctakes.typesystem.type.textsem.TimeMention;
 import org.apache.log4j.Logger;
 import org.apache.uima.UimaContext;
 import org.apache.uima.analysis_engine.AnalysisEngineDescription;
@@ -17,6 +16,7 @@ import org.apache.uima.resource.ResourceInitializationException;
 
 import tempus.type.DocumentCreationTime;
 import tempus.type.Event;
+import tempus.type.Timex3;
 
 /**
  * Class for writing THYME-corpus type annotations to document
@@ -269,18 +269,18 @@ public class THYMECorpusWriter extends JCasAnnotator_ImplBase{
 		int timecounter = 0;
 
 		//Timexes
-		FSIterator it_timex = jcas.getAnnotationIndex(TimeMention.type).iterator();
+		FSIterator it_timex = jcas.getAnnotationIndex(Timex3.type).iterator();
 		while(it_timex.hasNext()) {
 
 			// dates come first
 			timecounter++;
-			TimeMention e = (TimeMention) it_timex.next();
+			Timex3 e = (Timex3) it_timex.next();
 
 			docString.append("<entity>\n");
 
 			docString.append("<id>");
 			//docString.append("T"+timecounter);
-			docString.append(e.getTimeClass()+e.getId());
+			docString.append(e.getId());
 			docString.append("</id>\n");
 
 			docString.append("<span>");
@@ -299,7 +299,7 @@ public class THYMECorpusWriter extends JCasAnnotator_ImplBase{
 			docString.append("<properties>\n");
 
 			docString.append("<Class>");
-			String timextype = e.getTimeClass();
+			String timextype = e.getTimex3Type();
 			if(timextype == null)
 				timextype = "NOTYPE";
 			docString.append(timextype);

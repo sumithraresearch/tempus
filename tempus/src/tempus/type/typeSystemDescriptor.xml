@@ -42,7 +42,7 @@
     <typeDescription>
       <name>tempus.type.Event</name>
       <description/>
-      <supertypeName>uima.tcas.Annotation</supertypeName>
+      <supertypeName>tempus.type.TimeRelationAnnotationElement</supertypeName>
       <features>
         <featureDescription>
           <name>contextualaspect</name>
@@ -81,6 +81,72 @@
         </featureDescription>
         <featureDescription>
           <name>id</name>
+          <description/>
+          <rangeTypeName>uima.cas.String</rangeTypeName>
+        </featureDescription>
+      </features>
+    </typeDescription>
+  <typeDescription>
+      <name>tempus.type.TimeRelationAnnotationElement</name>
+      <description/>
+      <supertypeName>uima.tcas.Annotation</supertypeName>
+      <features>
+        <featureDescription>
+          <name>Id</name>
+          <description/>
+          <rangeTypeName>uima.cas.String</rangeTypeName>
+        </featureDescription>
+      </features>
+    </typeDescription>
+    <typeDescription>
+      <name>tempus.type.Timex3</name>
+      <description/>
+      <supertypeName>tempus.type.TimeRelationAnnotationElement</supertypeName>
+      <features>
+        <featureDescription>
+          <name>id</name>
+          <description/>
+          <rangeTypeName>uima.cas.String</rangeTypeName>
+        </featureDescription>
+        <featureDescription>
+          <name>timex3Type</name>
+          <description/>
+          <rangeTypeName>uima.cas.String</rangeTypeName>
+        </featureDescription>
+        <featureDescription>
+          <name>mod</name>
+          <description/>
+          <rangeTypeName>uima.cas.String</rangeTypeName>
+        </featureDescription>
+        <featureDescription>
+          <name>val</name>
+          <description/>
+          <rangeTypeName>uima.cas.String</rangeTypeName>
+        </featureDescription>
+      </features>
+    </typeDescription>
+    <typeDescription>
+      <name>tempus.type.TemporalLink</name>
+      <description/>
+      <supertypeName>uima.tcas.Annotation</supertypeName>
+      <features>
+        <featureDescription>
+          <name>fromId</name>
+          <description/>
+          <rangeTypeName>tempus.type.TimeRelationAnnotationElement</rangeTypeName>
+        </featureDescription>
+        <featureDescription>
+          <name>toId</name>
+          <description/>
+          <rangeTypeName>tempus.type.TimeRelationAnnotationElement</rangeTypeName>
+        </featureDescription>
+        <featureDescription>
+          <name>id</name>
+          <description/>
+          <rangeTypeName>uima.cas.String</rangeTypeName>
+        </featureDescription>
+        <featureDescription>
+          <name>temporalLinkType</name>
           <description/>
           <rangeTypeName>uima.cas.String</rangeTypeName>
         </featureDescription>

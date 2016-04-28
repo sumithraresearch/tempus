@@ -1,6 +1,6 @@
 
 
-/* First created by JCasGen Thu Apr 14 14:54:36 BST 2016 */
+/* First created by JCasGen Thu Apr 28 11:48:38 BST 2016 */
 package tempus.type;
 
 import org.apache.uima.jcas.JCas; 
@@ -14,12 +14,12 @@ import org.apache.uima.jcas.tcas.Annotation;
  * Updated by JCasGen Thu Apr 28 12:03:49 BST 2016
  * XML source: /Users/sumithra/git/tempus/tempus/src/tempus/type/typeSystemDescriptor.xml
  * @generated */
-public class Section extends Annotation {
+public class TimeRelationAnnotationElement extends Annotation {
   /** @generated
    * @ordered 
    */
   @SuppressWarnings ("hiding")
-  public final static int typeIndexID = JCasRegistry.register(Section.class);
+  public final static int typeIndexID = JCasRegistry.register(TimeRelationAnnotationElement.class);
   /** @generated
    * @ordered 
    */
@@ -33,14 +33,14 @@ public class Section extends Annotation {
  
   /** Never called.  Disable default constructor
    * @generated */
-  protected Section() {/* intentionally empty block */}
+  protected TimeRelationAnnotationElement() {/* intentionally empty block */}
     
   /** Internal - constructor used by generator 
    * @generated
    * @param addr low level Feature Structure reference
    * @param type the type of this Feature Structure 
    */
-  public Section(int addr, TOP_Type type) {
+  public TimeRelationAnnotationElement(int addr, TOP_Type type) {
     super(addr, type);
     readObject();
   }
@@ -48,7 +48,7 @@ public class Section extends Annotation {
   /** @generated
    * @param jcas JCas to which this Feature Structure belongs 
    */
-  public Section(JCas jcas) {
+  public TimeRelationAnnotationElement(JCas jcas) {
     super(jcas);
     readObject();   
   } 
@@ -58,7 +58,7 @@ public class Section extends Annotation {
    * @param begin offset to the begin spot in the SofA
    * @param end offset to the end spot in the SofA 
   */  
-  public Section(JCas jcas, int begin, int end) {
+  public TimeRelationAnnotationElement(JCas jcas, int begin, int end) {
     super(jcas);
     setBegin(begin);
     setEnd(end);
@@ -77,25 +77,25 @@ public class Section extends Annotation {
  
     
   //*--------------*
-  //* Feature: id
+  //* Feature: Id
 
-  /** getter for id - gets 
+  /** getter for Id - gets 
    * @generated
    * @return value of the feature 
    */
   public String getId() {
-    if (Section_Type.featOkTst && ((Section_Type)jcasType).casFeat_id == null)
-      jcasType.jcas.throwFeatMissing("id", "tempus.type.Section");
-    return jcasType.ll_cas.ll_getStringValue(addr, ((Section_Type)jcasType).casFeatCode_id);}
+    if (TimeRelationAnnotationElement_Type.featOkTst && ((TimeRelationAnnotationElement_Type)jcasType).casFeat_Id == null)
+      jcasType.jcas.throwFeatMissing("Id", "tempus.type.TimeRelationAnnotationElement");
+    return jcasType.ll_cas.ll_getStringValue(addr, ((TimeRelationAnnotationElement_Type)jcasType).casFeatCode_Id);}
     
-  /** setter for id - sets  
+  /** setter for Id - sets  
    * @generated
    * @param v value to set into the feature 
    */
   public void setId(String v) {
-    if (Section_Type.featOkTst && ((Section_Type)jcasType).casFeat_id == null)
-      jcasType.jcas.throwFeatMissing("id", "tempus.type.Section");
-    jcasType.ll_cas.ll_setStringValue(addr, ((Section_Type)jcasType).casFeatCode_id, v);}    
+    if (TimeRelationAnnotationElement_Type.featOkTst && ((TimeRelationAnnotationElement_Type)jcasType).casFeat_Id == null)
+      jcasType.jcas.throwFeatMissing("Id", "tempus.type.TimeRelationAnnotationElement");
+    jcasType.ll_cas.ll_setStringValue(addr, ((TimeRelationAnnotationElement_Type)jcasType).casFeatCode_Id, v);}    
   }
 
     

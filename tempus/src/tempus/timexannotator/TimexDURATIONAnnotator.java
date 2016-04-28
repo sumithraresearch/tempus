@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.ctakes.typesystem.type.syntax.BaseToken;
-import org.apache.ctakes.typesystem.type.textsem.TimeMention;
 import org.apache.ctakes.typesystem.type.textspan.Sentence;
 import org.apache.log4j.Logger;
 import org.apache.uima.UimaContext;
@@ -38,12 +37,13 @@ import org.cleartk.ml.viterbi.DefaultOutcomeFeatureExtractor;
 import org.cleartk.ml.viterbi.ViterbiDataWriterFactory;
 
 import tempus.type.Section;
+import tempus.type.Timex3;
 
 import com.google.common.collect.Lists;
 
 /**
  * Class for Timex3 DURATION annotations in the THYME corpus
- * Requires Annotations of type Section, Sentence, BaseToken, TimeMention
+ * Requires Annotations of type Section, Sentence, BaseToken, Timex3
  * Based on examples from the tutorials in the clearTK package: https://cleartk.github.io/cleartk/ 
  * 
  * @author Sumithra Velupillai
@@ -55,7 +55,7 @@ public class TimexDURATIONAnnotator extends CleartkSequenceAnnotator<String>{
 
 	private List<CleartkExtractor<BaseToken, BaseToken>> contextFeatureExtractors;
 
-	private BioChunking<BaseToken, TimeMention> chunking;
+	private BioChunking<BaseToken, Timex3> chunking;
 
 	private FeatureExtractor1<BaseToken> added_features;
 
@@ -64,7 +64,7 @@ public class TimexDURATIONAnnotator extends CleartkSequenceAnnotator<String>{
 		super.initialize(context);
 
 		// define chunking type
-		this.chunking = new BioChunking<BaseToken, TimeMention>(BaseToken.class, TimeMention.class);
+		this.chunking = new BioChunking<BaseToken, Timex3>(BaseToken.class, Timex3.class);
 
 		// add features: word, character pattern, stem, pos
 		this.tokenFeatureExtractors = Lists.newArrayList();
@@ -143,10 +143,10 @@ public class TimexDURATIONAnnotator extends CleartkSequenceAnnotator<String>{
 
 				// during training, convert Times to chunk labels and write the training Instances
 				if (this.isTraining()) {
-					List<TimeMention> dates = new ArrayList<TimeMention>();
-					List<TimeMention> times = JCasUtil.selectCovered(jCas, TimeMention.class, sentence);
-					for(TimeMention date : times){
-						if(date.getTimeClass().equals("DURATION")){
+					List<Timex3> dates = new ArrayList<Timex3>();
+					List<Timex3> times = JCasUtil.selectCovered(jCas, Timex3.class, sentence);
+					for(Timex3 date : times){
+						if(date.getTimex3Type().equals("DURATION")){
 							dates.add(date);
 						}
 					}
@@ -166,10 +166,10 @@ public class TimexDURATIONAnnotator extends CleartkSequenceAnnotator<String>{
 
 		// add IDs and type to all predicted Timex3s
 		int timeIndex = 1;
-		for (TimeMention time : JCasUtil.select(jCas, TimeMention.class)) {
-			if(time.getTimeClass()==null){
-				time.setTimeClass("DURATION");
-				time.setId(timeIndex);
+		for (Timex3 time : JCasUtil.select(jCas, Timex3.class)) {
+			if(time.getTimex3Type()==null){
+				time.setTimex3Type("DURATION");
+				time.setId("TDURATION"+timeIndex);
 			}
 			timeIndex += 1;
 		}

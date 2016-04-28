@@ -11,8 +11,8 @@ import org.apache.uima.jcas.tcas.Annotation;
 
 
 /** 
- * Updated by JCasGen Thu Apr 21 18:17:19 BST 2016
- * XML source: /Users/sumithra/DSV/scala_workspace/tempus/src/main/java/tempus/type/typeSystemDescriptor.xml
+ * Updated by JCasGen Thu Apr 28 12:03:49 BST 2016
+ * XML source: /Users/sumithra/git/tempus/tempus/src/tempus/type/typeSystemDescriptor.xml
  * @generated */
 public class DocumentCreationTime extends Annotation {
   /** @generated

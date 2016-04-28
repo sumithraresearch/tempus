@@ -41,12 +41,16 @@ import tempus.type.Timex3;
 
 import com.google.common.collect.Lists;
 
-public class TimexPREPOSTEXPAnnotator extends CleartkSequenceAnnotator<String>{
-	private Logger logger = Logger.getLogger(TimexPREPOSTEXPAnnotator.class);
+public class TimexFREQUENCYAnnotator extends CleartkSequenceAnnotator<String>{
+
+	private Logger logger = Logger.getLogger(TimexFREQUENCYAnnotator.class);
 
 	private List<NamedFeatureExtractor1<BaseToken>> tokenFeatureExtractors;
 
 	private List<CleartkExtractor<BaseToken, BaseToken>> contextFeatureExtractors;
+
+	//ADDED EXPERIMENT for 2016 challenge
+//	private FeatureExtractor1<Event> added_event_features;
 
 	private BioChunking<BaseToken, Timex3> chunking;
 
@@ -61,20 +65,17 @@ public class TimexPREPOSTEXPAnnotator extends CleartkSequenceAnnotator<String>{
 
 		// add features: word, character pattern, stem, pos
 		this.tokenFeatureExtractors = Lists.newArrayList();
+
 		this.tokenFeatureExtractors.add(new CoveredTextExtractor<BaseToken>());
 		NamedFeatureExtractor1<BaseToken> ex = CharacterCategoryPatternFunction.createExtractor();
 		this.tokenFeatureExtractors.add(ex);
-
 		this.tokenFeatureExtractors.add(new TypePathExtractor<BaseToken>(BaseToken.class, "partOfSpeech"));
-
-		// ADDED for 2016 challenge
-		//this.tokenFeatureExtractors.add(new InHeidelTimeFeatureExtractor<BaseToken>());
 
 		// add window of features before and after
 		this.contextFeatureExtractors = Lists.newArrayList();
 		for (FeatureExtractor1<BaseToken> extractor : this.tokenFeatureExtractors) {
 			this.contextFeatureExtractors.add(new CleartkExtractor<BaseToken, BaseToken>(BaseToken.class, extractor, new Preceding(
-					3), new Following(3)));
+					5), new Following(3)));
 		}
 
 		this.added_features = new FeatureFunctionExtractor<BaseToken>(
@@ -87,14 +88,17 @@ public class TimexPREPOSTEXPAnnotator extends CleartkSequenceAnnotator<String>{
 
 	@Override
 	public void process(JCas jCas) throws AnalysisEngineProcessException {
-		logger.info("Processing PREPOSTEXPs");
+		logger.info("Processing FREQUENCIES");
+
 		for(Section section : JCasUtil.select(jCas, Section.class)){
+			List<Sentence> sentences = JCasUtil.selectCovered(jCas, Sentence.class, section);
 			// classify tokens within each sentence
-			for (Sentence sentence : JCasUtil.selectCovered(jCas, Sentence.class, section)) {
+			for(Sentence sentence : sentences){
 				List<BaseToken> tokens = JCasUtil.selectCovered(jCas, BaseToken.class, sentence);
 
 				// extract features for all tokens
 				List<List<Feature>> featureLists = new ArrayList<List<Feature>>();
+
 				for (BaseToken token : tokens) {
 					List<Feature> features = new ArrayList<Feature>();
 					for (FeatureExtractor1<BaseToken> extractor : this.tokenFeatureExtractors) {
@@ -104,10 +108,32 @@ public class TimexPREPOSTEXPAnnotator extends CleartkSequenceAnnotator<String>{
 						features.addAll(extractor.extractWithin(jCas, token, sentence));
 					}
 
-					// added features
+					//List<Event> followingEvents = JCasUtil.selectFollowing(Event.class, token, 1);
+
+/*					// ADDED FEATURE for 2016 challenge
+					String f = "FOLLOWING_EVENT";
+					String v = "NONE";
+					if(followingEvents.size()>0)
+						v = followingEvents.get(0).getCoveredText();
+					Feature following_event = new Feature(f, v);
+					features.add(following_event);
+
+					List<Event> precedingEvents = JCasUtil.selectPreceding(Event.class, token, 1);
+
+					// ADDED FEATURE for 2016 challenge
+					String f2 = "PRECEDING_EVENT";
+					String v2 = "NONE";
+					if(precedingEvents.size()>0)
+						v2 = precedingEvents.get(0).getCoveredText();
+					Feature preceding_event = new Feature(f2, v2);
+					features.add(preceding_event);*/
+
+					//added features
 					features.addAll(this.added_features.extract(jCas, token));
+
+
 					//ADDED HEIDELTIME FEATURE
-					/*Map<BaseToken,Collection<de.unihd.dbs.uima.types.heideltime.Timex3>> coveringSection = JCasUtil.indexCovering(jCas,
+/*					Map<BaseToken,Collection<de.unihd.dbs.uima.types.heideltime.Timex3>> coveringSection = JCasUtil.indexCovering(jCas,
 							BaseToken.class,
 							de.unihd.dbs.uima.types.heideltime.Timex3.class
 							);
@@ -127,18 +153,20 @@ public class TimexPREPOSTEXPAnnotator extends CleartkSequenceAnnotator<String>{
 					else
 						ht = new Feature("IN_HEIDELTIME", "no");
 					features.add(ht);*/
-					features.add(new Feature("Section", section.getId()));
 
+					features.add(new Feature("Section", section.getId()));
 					featureLists.add(features);
 				}
 
+
+
+				//end added features
 				// during training, convert Times to chunk labels and write the training Instances
 				if (this.isTraining()) {
 					List<Timex3> dates = new ArrayList<Timex3>();
-
 					List<Timex3> times = JCasUtil.selectCovered(jCas, Timex3.class, sentence);
 					for(Timex3 date : times){
-						if(date.getTimex3Type().equals("PREPOSTEXP")){							
+						if(date.getTimex3Type().equals("FREQUENCY")){							
 							dates.add(date);
 						}
 					}
@@ -151,15 +179,16 @@ public class TimexPREPOSTEXPAnnotator extends CleartkSequenceAnnotator<String>{
 					List<String> outcomes = this.classifier.classify(featureLists);
 					this.chunking.createChunks(jCas, tokens, outcomes);
 				}
-			}// end sentence
-		}// end section
+			}// end for sentence
+			//}// end if section id equals
+		}// end for section
 
 		// add IDs and type to all predicted Timex3s
 		int timeIndex = 1;
 		for (Timex3 time : JCasUtil.select(jCas, Timex3.class)) {
 			if(time.getTimex3Type()==null){
-				time.setTimex3Type("PREPOSTEXP");
-				time.setId("TPREPOSTEXP"+timeIndex);
+				time.setTimex3Type("FREQUENCY");
+				time.setId("TFREQUENCY"+timeIndex);
 			}
 			timeIndex += 1;
 		}
@@ -167,7 +196,7 @@ public class TimexPREPOSTEXPAnnotator extends CleartkSequenceAnnotator<String>{
 	public static AnalysisEngineDescription getClassifierDescription(String modelFileName)
 			throws ResourceInitializationException {
 		return AnalysisEngineFactory.createEngineDescription(
-				TimexPREPOSTEXPAnnotator.class,
+				TimexFREQUENCYAnnotator.class,
 				CleartkSequenceAnnotator.PARAM_IS_TRAINING, false,
 				GenericJarClassifierFactory.PARAM_CLASSIFIER_JAR_PATH,
 				modelFileName);
@@ -176,7 +205,7 @@ public class TimexPREPOSTEXPAnnotator extends CleartkSequenceAnnotator<String>{
 	public static AnalysisEngineDescription getWriterDescription(String outputDirectory)
 			throws ResourceInitializationException {
 		return AnalysisEngineFactory.createEngineDescription(
-				TimexPREPOSTEXPAnnotator.class,
+				TimexFREQUENCYAnnotator.class,
 				CleartkSequenceAnnotator.PARAM_IS_TRAINING, true,
 				CleartkSequenceAnnotator.PARAM_DATA_WRITER_FACTORY_CLASS_NAME,
 				ViterbiDataWriterFactory.class.getName(),
@@ -193,6 +222,4 @@ public class TimexPREPOSTEXPAnnotator extends CleartkSequenceAnnotator<String>{
 
 
 }
-
-
 
