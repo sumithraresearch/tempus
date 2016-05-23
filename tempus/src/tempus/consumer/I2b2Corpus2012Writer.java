@@ -12,6 +12,7 @@ import org.apache.uima.analysis_engine.AnalysisEngineDescription;
 import org.apache.uima.cas.FSIterator;
 import org.apache.uima.fit.factory.AnalysisEngineFactory;
 import org.apache.uima.jcas.JCas;
+import org.apache.uima.jcas.tcas.Annotation;
 import org.apache.uima.resource.ResourceInitializationException;
 
 import tempus.type.DocumentCreationTime;
@@ -100,6 +101,8 @@ public class I2b2Corpus2012Writer extends JCasAnnotator_ImplBase {
 		FSIterator it_event = jcas.getAnnotationIndex(Event.type).iterator();
 		while(it_event.hasNext()) {
 			Event e = (Event) it_event.next();
+			String eventtext = e.getCoveredText();
+			eventtext = eventtext.replaceAll("\n", "");
 			// create the EVENT element
 			//TODO - index should be incremented with one if file if to be readable in i2b2 annotation tool!!
 			// this should be done with flag?
@@ -113,7 +116,7 @@ public class I2b2Corpus2012Writer extends JCasAnnotator_ImplBase {
 					//+(e.getEnd()+1)+
 					+(e.getEnd())+
 					"\" text=\""+
-					e.getCoveredText()+	
+					eventtext+	
 					"\" modality=\""+
 					e.getContextualmodality()+	
 					"\" polarity=\""+
@@ -128,6 +131,8 @@ public class I2b2Corpus2012Writer extends JCasAnnotator_ImplBase {
 		while(it_timex.hasNext()) {
 
 			Timex3 e = (Timex3) it_timex.next();
+			String timextext = e.getCoveredText();
+			timextext = timextext.replaceAll("\n", "");
 
 			docString.append("<TIMEX3 id=\""+
 					e.getId()+"\" start=\""+
@@ -137,7 +142,7 @@ public class I2b2Corpus2012Writer extends JCasAnnotator_ImplBase {
 					//(e.getEnd()+1)+
 					(e.getEnd())+
 					"\" text=\""+
-					e.getCoveredText()+
+					timextext+
 					"\" type=\""+
 					e.getTimex3Type()+
 					"\" val=\""+
@@ -149,20 +154,24 @@ public class I2b2Corpus2012Writer extends JCasAnnotator_ImplBase {
 		}
 		
 		int timerelationcounter = 0;
-		FSIterator it_timerelation = jcas.getAnnotationIndex(TemporalLink.type).iterator();
+		FSIterator<Annotation> it_timerelation = jcas.getAnnotationIndex(TemporalLink.type).iterator();
 		while(it_timerelation.hasNext()) {
 			timerelationcounter++;
 			TemporalLink e = (TemporalLink) it_timerelation.next();
+			String fromtext = e.getFromId().getCoveredText();
+			fromtext = fromtext.replaceAll("\n", "");
+			String totext = e.getToId().getCoveredText();
+			totext = totext.replaceAll("\n", "");
 			//<TLINK id="TL64" fromID="E53" fromText="admitted" toID="E49" toText="readmitted" type="SIMULTANEOUS" />
 			docString.append("<TLINK id=\""+
 					"TL"+timerelationcounter+"\" fromID=\""+
 					e.getFromId().getId()+
 					"\" fromText=\""+
-					e.getFromId().getCoveredText()+
+					fromtext+
 					"\" toID=\""+
 					e.getToId().getId()+
 					"\" toText=\""+
-					e.getToId().getCoveredText()+
+					totext+
 					"\" type=\""+e.getTemporalLinkType()+"\" />\n");
 		}
 		

@@ -12,6 +12,7 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -40,6 +41,7 @@ import tempus.type.DocumentCreationTime;
 import tempus.type.Event;
 import tempus.type.Section;
 import tempus.type.TemporalLink;
+import tempus.type.TimeRelationAnnotationElement;
 import tempus.type.Timex3;
 //CHANGED type system for TIMEX3
 
@@ -137,7 +139,7 @@ public class THYMECorpusReader extends CollectionReader_ImplBase {
 		// grab a file to process
 		File f = files.poll();
 		//System.out.println(files);
-		
+
 		//TODO: this needs to be more general
 		String strippedname = f.getName();
 		strippedname = strippedname.replaceAll(".Temporal-Entity-Adjudication.gold.completed.xml", "");
@@ -180,7 +182,7 @@ public class THYMECorpusReader extends CollectionReader_ImplBase {
 				fillJCasWithAnnotations(jcas, f, source_bytes);
 
 
-			
+
 
 
 			IOUtils.closeQuietly(inputStream);
@@ -418,175 +420,205 @@ public class THYMECorpusReader extends CollectionReader_ImplBase {
 			}
 		}
 	}
-	
+
 	private void fillJCasWithAnnotations(JCas jcas, File f, byte[] source_bytes) throws ParserConfigurationException, SAXException, IOException{
 		// parse annotation xml-file
-					DocumentBuilder db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+		DocumentBuilder db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 
-					Document doc = db.parse(f);
+		Document doc = db.parse(f);
 
-					doc.getDocumentElement().normalize();
+		doc.getDocumentElement().normalize();
 
-					// get the entities
-					NodeList nList = doc.getElementsByTagName("entity");
+		// get the entities
+		NodeList nList = doc.getElementsByTagName("entity");
 
-					//TODO: also read in relations!!
+		// Save all timexes and events for relations
+		TreeMap<String, Timex3> timexes = new TreeMap<String, Timex3>();
+		TreeMap<String, Event> events = new TreeMap<String, Event>();
 
-					// loop over all entities
-					for(int n = 0; n < nList.getLength(); n++){
-						Node textNode = nList.item(n);
-						// get children
-						NodeList children = textNode.getChildNodes();
+		// loop over all entities
+		for(int n = 0; n < nList.getLength(); n++){
+			Node textNode = nList.item(n);
+			// get children
+			NodeList children = textNode.getChildNodes();
 
-						// get specific nodes
-						String id = getNamedChild(children, "id");
-						String span = getNamedChild(children, "span");
-						// parse span offsets
-						String[] spans;
-						if(span.contains(";")){
-							spans = span.split(";");
-							String[] spans2 = spans[0].split(",");
-							spans = spans2;
-							//logger.log(Level.WARN, "MULTIPLE SPANS! Not handled correctly at the moment. File: "+f.getName()+", id: "+id+", spans: "+span);
-						}
-						else
-							spans = span.split(",");
-						Integer span1 = Integer.parseInt(spans[0]);
-						Integer span2 = Integer.parseInt(spans[1]);
-
-
-
-						// default string value for cases that are out of bounds
-						String textstring = "OUT OF BOUNDS";
-						if(source_bytes.length>span2)
-							textstring = new String(source_bytes, span1, span2-span1);
-						//else
-						//logger.log(Level.WARN, "OUT OF BOUNDS: "+f.getAbsolutePath()+": "+id);
-						//logger.log(Level.INFO, "File: "+f.getName()+": "+textstring);
-
-						String surrounding_text = "TEST";
-						Integer surrounding_span1 = span1-30;
-						Integer surrounding_span2 = span2+30;
-
-						if(source_bytes.length>surrounding_span2 && surrounding_span1>0)
-							surrounding_text = new String(source_bytes, surrounding_span1, surrounding_span2-surrounding_span1);
-
-						String entity_type = getNamedChild(children, "type");
-
-						// In the annotation files, there are also xml nodes named "adjudication", 
-						// not sure which to use in these cases, 
-						// have chosen to use only nodes under "annotations"
-						String parent_type = textNode.getParentNode().getNodeName();
+			// get specific nodes
+			String id = getNamedChild(children, "id");
+			String span = getNamedChild(children, "span");
+			// parse span offsets
+			String[] spans;
+			if(span.contains(";")){
+				spans = span.split(";");
+				String[] spans2 = spans[0].split(",");
+				spans = spans2;
+				//logger.log(Level.WARN, "MULTIPLE SPANS! Not handled correctly at the moment. File: "+f.getName()+", id: "+id+", spans: "+span);
+			}
+			else
+				spans = span.split(",");
+			Integer span1 = Integer.parseInt(spans[0]);
+			Integer span2 = Integer.parseInt(spans[1]);
 
 
-						if(entity_type.equals("EVENT") && parent_type.equals("annotations")){
-							// event nodes have properties children - save all these
-							NodeList childnodes = getNamedChildNodeList(children, "properties");
-							if(childnodes == null)
-								logger.error(f.getAbsolutePath()+": "+id);
-							String dtr = getNamedChild(childnodes, "DocTimeRel");
-							String event_type = getNamedChild(childnodes, "Type");
-							String degree = getNamedChild(childnodes, "Degree");
-							String polarity = getNamedChild(childnodes, "Polarity");
-							String contextual_modality = getNamedChild(childnodes, "ContextualModality");
-							String contextual_aspect = getNamedChild(childnodes, "ContextualAspect");
-							String permanence = getNamedChild(childnodes, "Permanence");
-							// create a THYME_Entity_Event with all info
 
-							Event e = new Event(jcas);
-							e.setBegin(span1);
-							e.setEnd(span2);
-							e.setContextualaspect(contextual_aspect);
-							e.setId(id);
-							e.setPolarity(polarity);
-							e.setContextualmodality(contextual_modality);
-							e.setDegree(degree);
-							e.setDoctimerel(dtr);
-							e.setEventClass(event_type);
-							e.setPermanence(permanence);
-							//TODO: MAKE SURE ALL ATTRIBUTES ARE SET - CHANGE TYPE SYSTEM!
-							e.addToIndexes();
-							//THYME_Entity_Event tee = new THYME_Entity_Event(id, entity_type, dtr, 
-							//		event_type, degree, polarity, contextual_modality, 
-							//		contextual_aspect, permanence, textstring, span1, span2);
+			// default string value for cases that are out of bounds
+			String textstring = "OUT OF BOUNDS";
+			if(source_bytes.length>span2)
+				textstring = new String(source_bytes, span1, span2-span1);
+			//else
+			//logger.log(Level.WARN, "OUT OF BOUNDS: "+f.getAbsolutePath()+": "+id);
+			//logger.log(Level.INFO, "File: "+f.getName()+": "+textstring);
+
+			String surrounding_text = "TEST";
+			Integer surrounding_span1 = span1-30;
+			Integer surrounding_span2 = span2+30;
+
+			if(source_bytes.length>surrounding_span2 && surrounding_span1>0)
+				surrounding_text = new String(source_bytes, surrounding_span1, surrounding_span2-surrounding_span1);
+
+			String entity_type = getNamedChild(children, "type");
+
+			// In the annotation files, there are also xml nodes named "adjudication", 
+			// not sure which to use in these cases, 
+			// have chosen to use only nodes under "annotations"
+			String parent_type = textNode.getParentNode().getNodeName();
 
 
-						}
-						else if(entity_type.equals("TIMEX3")&& parent_type.equals("annotations")){
-							NodeList childnodes = getNamedChildNodeList(children, "properties");
-							// currently, TIMEX annotations only contain type information, 
-							// no normalized values
-							String timex_type = getNamedChild(childnodes, "Class");
-							
+			if(entity_type.equals("EVENT") && parent_type.equals("annotations")){
+				// event nodes have properties children - save all these
+				NodeList childnodes = getNamedChildNodeList(children, "properties");
+				if(childnodes == null)
+					logger.error(f.getAbsolutePath()+": "+id);
+				String dtr = getNamedChild(childnodes, "DocTimeRel");
+				String event_type = getNamedChild(childnodes, "Type");
+				String degree = getNamedChild(childnodes, "Degree");
+				String polarity = getNamedChild(childnodes, "Polarity");
+				String contextual_modality = getNamedChild(childnodes, "ContextualModality");
+				String contextual_aspect = getNamedChild(childnodes, "ContextualAspect");
+				String permanence = getNamedChild(childnodes, "Permanence");
+				// create a THYME_Entity_Event with all info
+
+				Event e = new Event(jcas);
+				e.setBegin(span1);
+				e.setEnd(span2);
+				e.setContextualaspect(contextual_aspect);
+				e.setId(id);
+				e.setPolarity(polarity);
+				e.setContextualmodality(contextual_modality);
+				e.setDegree(degree);
+				e.setDoctimerel(dtr);
+				e.setEventClass(event_type);
+				e.setPermanence(permanence);
+				//TODO: MAKE SURE ALL ATTRIBUTES ARE SET - CHANGE TYPE SYSTEM!
+				e.addToIndexes();
+				events.put(id, e);
+				//THYME_Entity_Event tee = new THYME_Entity_Event(id, entity_type, dtr, 
+				//		event_type, degree, polarity, contextual_modality, 
+				//		contextual_aspect, permanence, textstring, span1, span2);
 
 
-							Timex3 tm = new Timex3(jcas);
-							tm.setBegin(span1);
-							tm.setEnd(span2);
-							tm.setTimex3Type(timex_type);
-
-							tm.addToIndexes();
-
-						}
-						else{
-							// DocTime and SecTime are similar, stored in one type
-							// TODO: better to separate these?
-							// TODO: FIX TYPE SYSTEM FOR DOCTIME, SECTIME etc
-							//THYME_Entity_DSTIME ted = new THYME_Entity_DSTIME(id, entity_type,  
-							//		textstring, span1, span2);
-
-						}
+			}
+			else if(entity_type.equals("TIMEX3")&& parent_type.equals("annotations")){
+				NodeList childnodes = getNamedChildNodeList(children, "properties");
+				// currently, TIMEX annotations only contain type information, 
+				// no normalized values
+				String timex_type = getNamedChild(childnodes, "Class");
 
 
-					}// end for-loop entity
+
+				Timex3 tm = new Timex3(jcas);
+				tm.setBegin(span1);
+				tm.setEnd(span2);
+				tm.setTimex3Type(timex_type);
+
+				tm.addToIndexes();
+				timexes.put(id, tm);
+
+			}
+			else{
+				// DocTime and SecTime are similar, stored in one type
+				// TODO: better to separate these?
+				// TODO: FIX TYPE SYSTEM FOR DOCTIME, SECTIME etc
+				//THYME_Entity_DSTIME ted = new THYME_Entity_DSTIME(id, entity_type,  
+				//		textstring, span1, span2);
+
+			}
 
 
-					// get the relations
-					NodeList nListRelations = doc.getElementsByTagName("relation");
+		}// end for-loop entity
 
 
-					// loop over all relations
-					for(int n = 0; n < nListRelations.getLength(); n++){
-						Node textNode = nListRelations.item(n);
-						// get children
-						NodeList relationchildren = textNode.getChildNodes();
-
-						// get specific nodes
-						String id = getNamedChild(relationchildren, "id");
-
-						String relation_type = getNamedChild(relationchildren, "type");
-						//System.out.println(relation_type);
-
-						// In the annotation files, there are also xml nodes named "adjudication", 
-						// not sure which to use in these cases, 
-						// have chosen to use only nodes under "annotations"
-						String parent_type = textNode.getParentNode().getNodeName();
+		// get the relations
+		NodeList nListRelations = doc.getElementsByTagName("relation");
 
 
-						if(parent_type.equals("annotations")){
-							// relation nodes have properties children - save all these
-							NodeList childnodes = getNamedChildNodeList(relationchildren, "properties");
-							//if(childnodes == null)
-							//	logger.log(Level.WARN, f.getAbsolutePath()+": "+id);
-							String source = getNamedChild(childnodes, "Source");
-							String relation_subtype = getNamedChild(childnodes, "Type");
-							String target = getNamedChild(childnodes, "Target");
+		// loop over all relations
+		for(int n = 0; n < nListRelations.getLength(); n++){
+			Node textNode = nListRelations.item(n);
+			// get children
+			NodeList relationchildren = textNode.getChildNodes();
 
-							// create a THYME_Relation with all info
-							//THYME_Relation tr = new THYME_Relation(id, relation_type, source, target, relation_subtype);
-							
-							//TODO: add source and targets!!
-							TemporalLink tl = new TemporalLink(jcas);
-							tl.setTemporalLinkType(relation_subtype);
-							tl.addToIndexes();
+			// get specific nodes
+			String id = getNamedChild(relationchildren, "id");
 
+			String relation_type = getNamedChild(relationchildren, "type");
+			//System.out.println(relation_type);
 
-						}
-
-					}// end for-loop relation
+			// In the annotation files, there are also xml nodes named "adjudication", 
+			// not sure which to use in these cases, 
+			// have chosen to use only nodes under "annotations"
+			String parent_type = textNode.getParentNode().getNodeName();
 
 
-		
+			if(parent_type.equals("annotations")){
+				// relation nodes have properties children - save all these
+				NodeList childnodes = getNamedChildNodeList(relationchildren, "properties");
+				//if(childnodes == null)
+				//	logger.log(Level.WARN, f.getAbsolutePath()+": "+id);
+				String source = getNamedChild(childnodes, "Source");
+				String relation_subtype = getNamedChild(childnodes, "Type");
+				String target = getNamedChild(childnodes, "Target");
+				Timex3 tmptimexto = timexes.get(target);
+				Event tmpeventto = events.get(target);
+				TimeRelationAnnotationElement to = null;
+				if(tmptimexto instanceof Timex3)
+					to = tmptimexto;
+				else
+					to = tmpeventto;
+				if(to==null){
+					logger.error("Target entity is null! Probably SectionTime");
+				}
+				Timex3 tmptimexfrom = timexes.get(source);
+				Event tmpeventfrom = events.get(source);
+				TimeRelationAnnotationElement from = null;
+				if(tmptimexfrom instanceof Timex3)
+					from = tmptimexfrom;
+				else
+					from = tmpeventfrom;
+				if(from==null){
+					logger.error("Source entity is null! Probably SectionTime");
+				}
+				// create a THYME_Relation with all info
+				//THYME_Relation tr = new THYME_Relation(id, relation_type, source, target, relation_subtype);
+
+				//TODO: Sectiontime (and more?) are sometimes part of TLINKS, these are not read in at the moment
+				if(from!=null&&to!=null){
+					TemporalLink tl = new TemporalLink(jcas);
+					tl.setTemporalLinkType(relation_subtype);
+					tl.setFromId(from);
+					tl.setToId(to);
+					tl.setId(id);
+					tl.addToIndexes();
+				}
+
+
+
+
+			}
+
+		}// end for-loop relation
+
+
+
 	}
 }
 
