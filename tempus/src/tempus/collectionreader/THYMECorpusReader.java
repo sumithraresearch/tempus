@@ -37,15 +37,20 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import tempus.type.DocTime;
 import tempus.type.DocumentCreationTime;
 import tempus.type.Event;
 import tempus.type.Section;
+import tempus.type.SectionTime;
 import tempus.type.TemporalLink;
 import tempus.type.TimeRelationAnnotationElement;
 import tempus.type.Timex3;
 //CHANGED type system for TIMEX3
 
-
+/**
+ * @author Sumithra Velupillai, based on readers from the HeidelTime package
+ *
+ */
 public class THYMECorpusReader extends CollectionReader_ImplBase {
 
 	private Logger logger = Logger.getLogger(THYMECorpusReader.class);
@@ -436,6 +441,9 @@ public class THYMECorpusReader extends CollectionReader_ImplBase {
 		TreeMap<String, Timex3> timexes = new TreeMap<String, Timex3>();
 		TreeMap<String, Event> events = new TreeMap<String, Event>();
 
+		TreeMap<String, TimeRelationAnnotationElement> relationElement = new TreeMap<String, TimeRelationAnnotationElement>();
+
+
 		// loop over all entities
 		for(int n = 0; n < nList.getLength(); n++){
 			Node textNode = nList.item(n);
@@ -510,7 +518,10 @@ public class THYMECorpusReader extends CollectionReader_ImplBase {
 				e.setPermanence(permanence);
 				//TODO: MAKE SURE ALL ATTRIBUTES ARE SET - CHANGE TYPE SYSTEM!
 				e.addToIndexes();
+				// TODO: could this be removed and use below instead?
 				events.put(id, e);
+				relationElement.put(id, e);
+
 				//THYME_Entity_Event tee = new THYME_Entity_Event(id, entity_type, dtr, 
 				//		event_type, degree, polarity, contextual_modality, 
 				//		contextual_aspect, permanence, textstring, span1, span2);
@@ -532,14 +543,35 @@ public class THYMECorpusReader extends CollectionReader_ImplBase {
 
 				tm.addToIndexes();
 				timexes.put(id, tm);
+				relationElement.put(id, tm);
+
+			}
+			else if(entity_type.equals("SECTIONTIME")&& parent_type.equals("annotations")){
+
+				SectionTime st = new SectionTime(jcas);
+				st.setBegin(span1);
+				st.setEnd(span2);
+				st.setId(id);
+
+				st.addToIndexes();
+				relationElement.put(id, st);
+
+
+			}
+			else if(entity_type.equals("DOCTIME")&& parent_type.equals("annotations")){
+
+				DocTime st = new DocTime(jcas);
+				st.setBegin(span1);
+				st.setEnd(span2);
+				st.setId(id);
+
+				st.addToIndexes();
+				relationElement.put(id, st);
+
 
 			}
 			else{
-				// DocTime and SecTime are similar, stored in one type
-				// TODO: better to separate these?
-				// TODO: FIX TYPE SYSTEM FOR DOCTIME, SECTIME etc
-				//THYME_Entity_DSTIME ted = new THYME_Entity_DSTIME(id, entity_type,  
-				//		textstring, span1, span2);
+				logger.error("SOMETHING IS WRONG, A TYPE HAS NOT BEEN ADDED: "+id);
 
 			}
 
@@ -577,26 +609,31 @@ public class THYMECorpusReader extends CollectionReader_ImplBase {
 				String source = getNamedChild(childnodes, "Source");
 				String relation_subtype = getNamedChild(childnodes, "Type");
 				String target = getNamedChild(childnodes, "Target");
-				Timex3 tmptimexto = timexes.get(target);
-				Event tmpeventto = events.get(target);
-				TimeRelationAnnotationElement to = null;
-				if(tmptimexto instanceof Timex3)
-					to = tmptimexto;
-				else
-					to = tmpeventto;
-				if(to==null){
-					logger.error("Target entity is null! Probably SectionTime");
-				}
-				Timex3 tmptimexfrom = timexes.get(source);
-				Event tmpeventfrom = events.get(source);
-				TimeRelationAnnotationElement from = null;
-				if(tmptimexfrom instanceof Timex3)
-					from = tmptimexfrom;
-				else
-					from = tmpeventfrom;
-				if(from==null){
-					logger.error("Source entity is null! Probably SectionTime");
-				}
+				
+				TimeRelationAnnotationElement to = relationElement.get(target);
+				TimeRelationAnnotationElement from = relationElement.get(source);
+				
+				//TODO: could this be removed?
+//				Timex3 tmptimexto = timexes.get(target);
+//				Event tmpeventto = events.get(target);
+//				TimeRelationAnnotationElement to = null;
+//				if(tmptimexto instanceof Timex3)
+//					to = tmptimexto;
+//				else
+//					to = tmpeventto;
+//				if(to==null){
+//					logger.error("Target entity is null! Probably SectionTime");
+//				}
+//				Timex3 tmptimexfrom = timexes.get(source);
+//				Event tmpeventfrom = events.get(source);
+//				TimeRelationAnnotationElement from = null;
+//				if(tmptimexfrom instanceof Timex3)
+//					from = tmptimexfrom;
+//				else
+//					from = tmpeventfrom;
+//				if(from==null){
+//					logger.error("Source entity is null! Probably SectionTime");
+//				}
 				// create a THYME_Relation with all info
 				//THYME_Relation tr = new THYME_Relation(id, relation_type, source, target, relation_subtype);
 
@@ -604,10 +641,21 @@ public class THYMECorpusReader extends CollectionReader_ImplBase {
 				if(from!=null&&to!=null){
 					TemporalLink tl = new TemporalLink(jcas);
 					tl.setTemporalLinkType(relation_subtype);
+					tl.setTemporalLinkSuperType(relation_type);
 					tl.setFromId(from);
 					tl.setToId(to);
 					tl.setId(id);
+					tl.setBegin(from.getBegin());
+					tl.setEnd(to.getEnd());
 					tl.addToIndexes();
+				}
+				else{
+					if(from==null)
+						logger.error("Source entity is null!");
+					else if(to==null)
+						logger.error("Target entity is null!");
+					else
+						logger.error("Something wrong with relation assignment");
 				}
 
 

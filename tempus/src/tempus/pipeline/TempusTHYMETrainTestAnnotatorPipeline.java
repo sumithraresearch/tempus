@@ -7,6 +7,7 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
 import org.apache.uima.collection.CollectionReader;
 import org.apache.uima.fit.factory.AggregateBuilder;
@@ -173,7 +174,7 @@ public class TempusTHYMETrainTestAnnotatorPipeline {
 		}
 
 		else{
-			builder.add(EventAnnotator.getClassifierDescription(this.modeloutputdirectory+"/event/model.jar"));
+			builder.add(EventAnnotator.getClassifierDescription(FilenameUtils.separatorsToSystem(this.modeloutputdirectory+"/event/model.jar")));
 
 			builder.add(EventPolarityAnnotator.getClassifierDescription(this.modeloutputdirectory+"/polarity/model.jar", keywordfile));
 			builder.add(EventModalityAnnotator.getClassifierDescription(this.modeloutputdirectory+"/modality/model.jar", keywordfile));

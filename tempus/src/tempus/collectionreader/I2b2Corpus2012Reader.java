@@ -37,6 +37,7 @@ import org.xml.sax.SAXException;
 import tempus.type.DocumentCreationTime;
 import tempus.type.Event;
 import tempus.type.Section;
+import tempus.type.SectionTime;
 import tempus.type.TemporalLink;
 import tempus.type.TimeRelationAnnotationElement;
 import tempus.type.Timex3;
@@ -132,7 +133,7 @@ public class I2b2Corpus2012Reader extends CollectionReader_ImplBase {
 			Node textNode = nList.item(0);
 			String text = textNode.getTextContent();
 
-			
+
 
 			jcas.setDocumentText(text);
 			// TODO: add better handling of Sections - there are no sections in the i2b2 corpus.
@@ -199,9 +200,9 @@ public class I2b2Corpus2012Reader extends CollectionReader_ImplBase {
 	}
 
 	private void fillJCasWithAnnotations(JCas jcas, Document doc){
-		
+
 		HashMap<String, TimeRelationAnnotationElement> allRelationElements = new HashMap<String, TimeRelationAnnotationElement>();
-		
+
 		NodeList nList = doc.getElementsByTagName("EVENT");
 		for(int n = 0; n < nList.getLength(); n++){
 			Node i2b2Node = nList.item(n);
@@ -218,7 +219,7 @@ public class I2b2Corpus2012Reader extends CollectionReader_ImplBase {
 
 			Integer span1 = Integer.parseInt(startspan);
 			Integer span2 = Integer.parseInt(endspan);
-			
+
 			Event e = new Event(jcas);
 			e.setBegin(span1);
 			e.setEnd(span2);
@@ -227,13 +228,12 @@ public class I2b2Corpus2012Reader extends CollectionReader_ImplBase {
 			e.setEventClass(eventType);
 			e.setId(id);
 			e.addToIndexes();
-			
+
 			TimeRelationAnnotationElement tmp = (TimeRelationAnnotationElement) e;
 			allRelationElements.put(id, tmp);
-			
+
 		}
-		
-		//TODO: The TimeMention type is not sufficient for the i2b2 Timex3 annotations, change!
+
 		nList = doc.getElementsByTagName("TIMEX3");
 		for(int n = 0; n < nList.getLength(); n++){
 			Node i2b2Node = nList.item(n);
@@ -242,7 +242,7 @@ public class I2b2Corpus2012Reader extends CollectionReader_ImplBase {
 
 			// get specific nodes
 			String id = node.getAttribute("id");
-			
+
 			String startspan = node.getAttribute("start");
 			String endspan = node.getAttribute("end");
 			String val = node.getAttribute("val");
@@ -251,7 +251,7 @@ public class I2b2Corpus2012Reader extends CollectionReader_ImplBase {
 
 			Integer span1 = Integer.parseInt(startspan);
 			Integer span2 = Integer.parseInt(endspan);
-			
+
 			Timex3 tm = new Timex3(jcas);
 			tm.setBegin(span1);
 			tm.setEnd(span2);
@@ -262,33 +262,71 @@ public class I2b2Corpus2012Reader extends CollectionReader_ImplBase {
 			tm.addToIndexes();
 			TimeRelationAnnotationElement tmp = (TimeRelationAnnotationElement) tm;
 			allRelationElements.put(id, tmp);
-			
-		}
-		
-				nList = doc.getElementsByTagName("TLINK");
-				for(int n = 0; n < nList.getLength(); n++){
-					Node i2b2Node = nList.item(n);
-					// get attributes
-					Element node = (Element) i2b2Node;
 
-					// get specific nodes
-					String id = node.getAttribute("id");
-					String fromID = node.getAttribute("fromID");
-					String toID = node.getAttribute("toID");
-					String tlType = node.getAttribute("type");
-					
-					TimeRelationAnnotationElement fromElement = allRelationElements.get(fromID);
-					TimeRelationAnnotationElement toElement = allRelationElements.get(toID);
-					//System.err.println("TESTING LINKS: "+toElement.getCoveredText());
-					
-					TemporalLink tr = new TemporalLink(jcas);
-					tr.setFromId(fromElement);
-					tr.setToId(toElement);
-					tr.setTemporalLinkType(tlType);
-					tr.setId(id);
-					tr.addToIndexes();
-					
-				}
+		}
+		nList = doc.getElementsByTagName("SECTIME");
+		for(int n = 0; n < nList.getLength(); n++){
+			Node i2b2Node = nList.item(n);
+			// get attributes
+			Element node = (Element) i2b2Node;
+
+			// get specific nodes
+			String id = node.getAttribute("id");
+
+			String startspan = node.getAttribute("start");
+			String endspan = node.getAttribute("end");
+			String t3Type = node.getAttribute("type");
+
+			Integer span1 = Integer.parseInt(startspan);
+			Integer span2 = Integer.parseInt(endspan);
+
+			SectionTime tm = new SectionTime(jcas);
+			tm.setBegin(span1);
+			tm.setEnd(span2);			
+			tm.setSectionTimeType(t3Type);
+			tm.setId(id);
+			tm.addToIndexes();
+			TimeRelationAnnotationElement tmp = (TimeRelationAnnotationElement) tm;
+			allRelationElements.put(id, tmp);
+
+		}
+
+		nList = doc.getElementsByTagName("TLINK");
+		for(int n = 0; n < nList.getLength(); n++){
+			Node i2b2Node = nList.item(n);
+			// get attributes
+			Element node = (Element) i2b2Node;
+
+			// get specific nodes
+			String id = node.getAttribute("id");
+			String fromID = node.getAttribute("fromID");
+			String toID = node.getAttribute("toID");
+			String tlType = node.getAttribute("type");
+			
+				
+
+			TimeRelationAnnotationElement fromElement = allRelationElements.get(fromID);
+			TimeRelationAnnotationElement toElement = allRelationElements.get(toID);
+			//System.err.println("TESTING LINKS: "+toElement.getCoveredText());
+			if(fromElement!=null&&toElement!=null){
+				TemporalLink tr = new TemporalLink(jcas);
+				tr.setFromId(fromElement);
+				tr.setToId(toElement);
+				tr.setTemporalLinkType(tlType.toUpperCase());
+				tr.setId(id);
+				tr.addToIndexes();
+			}
+			else{
+				if(fromElement==null)
+					logger.error("Source is null");
+				if(toElement==null)
+					logger.error("Target is null");
+				
+				logger.error("Something is wrong with relation assignment!"+id);
+				
+			}
+
+		}
 
 
 	}
@@ -340,7 +378,7 @@ public class I2b2Corpus2012Reader extends CollectionReader_ImplBase {
 					// TODO Auto-generated catch block
 					logger.error("Problem with file "+f.getAbsolutePath());
 				}
-				
+
 			}
 		}
 

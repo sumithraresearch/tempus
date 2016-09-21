@@ -44,6 +44,7 @@ import tempus.type.Section;
 
 import com.google.common.collect.Lists;
 
+
 public class EventDegreeAnnotator extends CleartkAnnotator<String> {
 
 	private Logger logger = Logger.getLogger(EventDegreeAnnotator.class);

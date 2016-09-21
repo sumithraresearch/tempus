@@ -10,7 +10,7 @@ import org.apache.uima.jcas.cas.TOP_Type;
 
 
 /** 
- * Updated by JCasGen Thu Apr 28 12:03:49 BST 2016
+ * Updated by JCasGen Tue Sep 20 11:53:12 BST 2016
  * XML source: /Users/sumithra/git/tempus/tempus/src/tempus/type/typeSystemDescriptor.xml
  * @generated */
 public class Timex3 extends TimeRelationAnnotationElement {

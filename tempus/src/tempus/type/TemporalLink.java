@@ -11,7 +11,7 @@ import org.apache.uima.jcas.tcas.Annotation;
 
 
 /** 
- * Updated by JCasGen Thu Apr 28 12:03:49 BST 2016
+ * Updated by JCasGen Tue Sep 20 11:53:12 BST 2016
  * XML source: /Users/sumithra/git/tempus/tempus/src/tempus/type/typeSystemDescriptor.xml
  * @generated */
 public class TemporalLink extends Annotation {
@@ -162,6 +162,28 @@ public class TemporalLink extends Annotation {
     if (TemporalLink_Type.featOkTst && ((TemporalLink_Type)jcasType).casFeat_temporalLinkType == null)
       jcasType.jcas.throwFeatMissing("temporalLinkType", "tempus.type.TemporalLink");
     jcasType.ll_cas.ll_setStringValue(addr, ((TemporalLink_Type)jcasType).casFeatCode_temporalLinkType, v);}    
+   
+    
+  //*--------------*
+  //* Feature: temporalLinkSuperType
+
+  /** getter for temporalLinkSuperType - gets 
+   * @generated
+   * @return value of the feature 
+   */
+  public String getTemporalLinkSuperType() {
+    if (TemporalLink_Type.featOkTst && ((TemporalLink_Type)jcasType).casFeat_temporalLinkSuperType == null)
+      jcasType.jcas.throwFeatMissing("temporalLinkSuperType", "tempus.type.TemporalLink");
+    return jcasType.ll_cas.ll_getStringValue(addr, ((TemporalLink_Type)jcasType).casFeatCode_temporalLinkSuperType);}
+    
+  /** setter for temporalLinkSuperType - sets  
+   * @generated
+   * @param v value to set into the feature 
+   */
+  public void setTemporalLinkSuperType(String v) {
+    if (TemporalLink_Type.featOkTst && ((TemporalLink_Type)jcasType).casFeat_temporalLinkSuperType == null)
+      jcasType.jcas.throwFeatMissing("temporalLinkSuperType", "tempus.type.TemporalLink");
+    jcasType.ll_cas.ll_setStringValue(addr, ((TemporalLink_Type)jcasType).casFeatCode_temporalLinkSuperType, v);}    
   }
 
     

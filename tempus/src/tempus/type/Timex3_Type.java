@@ -13,7 +13,7 @@ import org.apache.uima.cas.impl.FeatureImpl;
 import org.apache.uima.cas.Feature;
 
 /** 
- * Updated by JCasGen Thu Apr 28 12:03:49 BST 2016
+ * Updated by JCasGen Tue Sep 20 11:53:12 BST 2016
  * @generated */
 public class Timex3_Type extends TimeRelationAnnotationElement_Type {
   /** @generated 

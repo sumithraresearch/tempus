@@ -14,7 +14,7 @@ import org.apache.uima.cas.Feature;
 import org.apache.uima.jcas.tcas.Annotation_Type;
 
 /** 
- * Updated by JCasGen Thu Apr 28 12:03:49 BST 2016
+ * Updated by JCasGen Tue Sep 20 11:53:12 BST 2016
  * @generated */
 public class TemporalLink_Type extends Annotation_Type {
   /** @generated 
@@ -141,6 +141,30 @@ public class TemporalLink_Type extends Annotation_Type {
     ll_cas.ll_setStringValue(addr, casFeatCode_temporalLinkType, v);}
     
   
+ 
+  /** @generated */
+  final Feature casFeat_temporalLinkSuperType;
+  /** @generated */
+  final int     casFeatCode_temporalLinkSuperType;
+  /** @generated
+   * @param addr low level Feature Structure reference
+   * @return the feature value 
+   */ 
+  public String getTemporalLinkSuperType(int addr) {
+        if (featOkTst && casFeat_temporalLinkSuperType == null)
+      jcas.throwFeatMissing("temporalLinkSuperType", "tempus.type.TemporalLink");
+    return ll_cas.ll_getStringValue(addr, casFeatCode_temporalLinkSuperType);
+  }
+  /** @generated
+   * @param addr low level Feature Structure reference
+   * @param v value to set 
+   */    
+  public void setTemporalLinkSuperType(int addr, String v) {
+        if (featOkTst && casFeat_temporalLinkSuperType == null)
+      jcas.throwFeatMissing("temporalLinkSuperType", "tempus.type.TemporalLink");
+    ll_cas.ll_setStringValue(addr, casFeatCode_temporalLinkSuperType, v);}
+    
+  
 
 
 
@@ -168,6 +192,10 @@ public class TemporalLink_Type extends Annotation_Type {
  
     casFeat_temporalLinkType = jcas.getRequiredFeatureDE(casType, "temporalLinkType", "uima.cas.String", featOkTst);
     casFeatCode_temporalLinkType  = (null == casFeat_temporalLinkType) ? JCas.INVALID_FEATURE_CODE : ((FeatureImpl)casFeat_temporalLinkType).getCode();
+
+ 
+    casFeat_temporalLinkSuperType = jcas.getRequiredFeatureDE(casType, "temporalLinkSuperType", "uima.cas.String", featOkTst);
+    casFeatCode_temporalLinkSuperType  = (null == casFeat_temporalLinkSuperType) ? JCas.INVALID_FEATURE_CODE : ((FeatureImpl)casFeat_temporalLinkSuperType).getCode();
 
   }
 }

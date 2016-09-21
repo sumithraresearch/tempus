@@ -19,8 +19,7 @@ import tempus.type.Event;
 import tempus.type.Timex3;
 
 /**
- * Class for writing THYME-corpus type annotations to document
- * Requires Annotations of type Section, Sentence, BaseToken, TimeMention, Event
+ * Class for writing THYME-corpus type annotations to an xml-document
  * 
  * @author Sumithra Velupillai
  */

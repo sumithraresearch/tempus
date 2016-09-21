@@ -14,7 +14,7 @@ import org.apache.uima.cas.Feature;
 import org.apache.uima.jcas.tcas.Annotation_Type;
 
 /** 
- * Updated by JCasGen Thu Apr 28 12:03:49 BST 2016
+ * Updated by JCasGen Tue Sep 20 11:53:12 BST 2016
  * @generated */
 public class Event_Type extends TimeRelationAnnotationElement_Type {
   /** @generated 

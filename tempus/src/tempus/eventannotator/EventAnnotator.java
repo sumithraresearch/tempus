@@ -43,7 +43,7 @@ import com.google.common.collect.Lists;
 
 
 /**
- * Class for Event annotations in the THYME corpus
+ * Class for Event annotations in the THYME corpus (or any corpus for which there is an appropriate reader)
  * Requires Annotations of type Section, Sentence, BaseToken, TimeMention
  * Defined features were those our team (BluLab) used in the 2015 Clinical TempEval challenge
  * Based on examples from the tutorials in the clearTK package: https://cleartk.github.io/cleartk/ 

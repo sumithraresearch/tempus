@@ -1,5 +1,5 @@
 
-/* First created by JCasGen Thu Apr 14 14:54:36 BST 2016 */
+/* First created by JCasGen Tue Sep 20 10:40:49 BST 2016 */
 package tempus.type;
 
 import org.apache.uima.jcas.JCas;
@@ -11,12 +11,11 @@ import org.apache.uima.cas.impl.TypeImpl;
 import org.apache.uima.cas.Type;
 import org.apache.uima.cas.impl.FeatureImpl;
 import org.apache.uima.cas.Feature;
-import org.apache.uima.jcas.tcas.Annotation_Type;
 
 /** 
  * Updated by JCasGen Tue Sep 20 11:53:12 BST 2016
  * @generated */
-public class Section_Type extends Annotation_Type {
+public class SectionTime_Type extends TimeRelationAnnotationElement_Type {
   /** @generated 
    * @return the generator for this type
    */
@@ -26,25 +25,25 @@ public class Section_Type extends Annotation_Type {
   private final FSGenerator fsGenerator = 
     new FSGenerator() {
       public FeatureStructure createFS(int addr, CASImpl cas) {
-  			 if (Section_Type.this.useExistingInstance) {
+  			 if (SectionTime_Type.this.useExistingInstance) {
   			   // Return eq fs instance if already created
-  		     FeatureStructure fs = Section_Type.this.jcas.getJfsFromCaddr(addr);
+  		     FeatureStructure fs = SectionTime_Type.this.jcas.getJfsFromCaddr(addr);
   		     if (null == fs) {
-  		       fs = new Section(addr, Section_Type.this);
-  			   Section_Type.this.jcas.putJfsFromCaddr(addr, fs);
+  		       fs = new SectionTime(addr, SectionTime_Type.this);
+  			   SectionTime_Type.this.jcas.putJfsFromCaddr(addr, fs);
   			   return fs;
   		     }
   		     return fs;
-        } else return new Section(addr, Section_Type.this);
+        } else return new SectionTime(addr, SectionTime_Type.this);
   	  }
     };
   /** @generated */
   @SuppressWarnings ("hiding")
-  public final static int typeIndexID = Section.typeIndexID;
+  public final static int typeIndexID = SectionTime.typeIndexID;
   /** @generated 
      @modifiable */
   @SuppressWarnings ("hiding")
-  public final static boolean featOkTst = JCasRegistry.getFeatOkTst("tempus.type.Section");
+  public final static boolean featOkTst = JCasRegistry.getFeatOkTst("tempus.type.SectionTime");
  
   /** @generated */
   final Feature casFeat_id;
@@ -56,7 +55,7 @@ public class Section_Type extends Annotation_Type {
    */ 
   public String getId(int addr) {
         if (featOkTst && casFeat_id == null)
-      jcas.throwFeatMissing("id", "tempus.type.Section");
+      jcas.throwFeatMissing("id", "tempus.type.SectionTime");
     return ll_cas.ll_getStringValue(addr, casFeatCode_id);
   }
   /** @generated
@@ -65,8 +64,32 @@ public class Section_Type extends Annotation_Type {
    */    
   public void setId(int addr, String v) {
         if (featOkTst && casFeat_id == null)
-      jcas.throwFeatMissing("id", "tempus.type.Section");
+      jcas.throwFeatMissing("id", "tempus.type.SectionTime");
     ll_cas.ll_setStringValue(addr, casFeatCode_id, v);}
+    
+  
+ 
+  /** @generated */
+  final Feature casFeat_sectionTimeType;
+  /** @generated */
+  final int     casFeatCode_sectionTimeType;
+  /** @generated
+   * @param addr low level Feature Structure reference
+   * @return the feature value 
+   */ 
+  public String getSectionTimeType(int addr) {
+        if (featOkTst && casFeat_sectionTimeType == null)
+      jcas.throwFeatMissing("sectionTimeType", "tempus.type.SectionTime");
+    return ll_cas.ll_getStringValue(addr, casFeatCode_sectionTimeType);
+  }
+  /** @generated
+   * @param addr low level Feature Structure reference
+   * @param v value to set 
+   */    
+  public void setSectionTimeType(int addr, String v) {
+        if (featOkTst && casFeat_sectionTimeType == null)
+      jcas.throwFeatMissing("sectionTimeType", "tempus.type.SectionTime");
+    ll_cas.ll_setStringValue(addr, casFeatCode_sectionTimeType, v);}
     
   
 
@@ -77,13 +100,17 @@ public class Section_Type extends Annotation_Type {
 	 * @param jcas JCas
 	 * @param casType Type 
 	 */
-  public Section_Type(JCas jcas, Type casType) {
+  public SectionTime_Type(JCas jcas, Type casType) {
     super(jcas, casType);
     casImpl.getFSClassRegistry().addGeneratorForType((TypeImpl)this.casType, getFSGenerator());
 
  
     casFeat_id = jcas.getRequiredFeatureDE(casType, "id", "uima.cas.String", featOkTst);
     casFeatCode_id  = (null == casFeat_id) ? JCas.INVALID_FEATURE_CODE : ((FeatureImpl)casFeat_id).getCode();
+
+ 
+    casFeat_sectionTimeType = jcas.getRequiredFeatureDE(casType, "sectionTimeType", "uima.cas.String", featOkTst);
+    casFeatCode_sectionTimeType  = (null == casFeat_sectionTimeType) ? JCas.INVALID_FEATURE_CODE : ((FeatureImpl)casFeat_sectionTimeType).getCode();
 
   }
 }

@@ -20,6 +20,10 @@ import tempus.type.Event;
 import tempus.type.TemporalLink;
 import tempus.type.Timex3;
 
+/**
+ * @author Sumithra Velupillai
+ *
+ */
 public class I2b2Corpus2012Writer extends JCasAnnotator_ImplBase {
 
 
